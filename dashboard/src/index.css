@@ -1,0 +1,44 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ─── Light theme (default) ─────────────────────────────── */
+:root {
+  --c-bg: 240 242 245;      /* WhatsApp light gray */
+  --c-surface: 255 255 255; /* white panels */
+  --c-elevated: 240 242 245;/* inputs / hover */
+  --c-border: 222 226 230;
+  --c-text: 17 27 33;
+  --c-muted: 102 117 128;
+}
+
+/* ─── Dark theme ────────────────────────────────────────── */
+html.dark {
+  --c-bg: 11 14 17;         /* WhatsApp dark */
+  --c-surface: 17 23 28;
+  --c-elevated: 32 44 51;
+  --c-border: 38 49 56;
+  --c-text: 233 237 239;
+  --c-muted: 142 154 162;
+}
+
+html, body, #root {
+  height: 100%;
+}
+
+body {
+  background-color: rgb(var(--c-bg));
+  color: rgb(var(--c-text));
+  font-family: system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+}
+
+/* WhatsApp-style chat wallpaper for the conversation panel */
+.wa-chat-bg {
+  background-color: rgb(var(--c-bg));
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='40' viewBox='0 0 40 40'%3E%3Cg fill='%23808080' fill-opacity='0.04'%3E%3Cpath d='M0 0h20v20H0zM20 20h20v20H20z'/%3E%3C/g%3E%3C/svg%3E");
+}
+
+/* Subtle scrollbars */
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-thumb { background: rgb(var(--c-border)); border-radius: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
