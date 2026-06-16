@@ -2,24 +2,24 @@
 @tailwind components;
 @tailwind utilities;
 
-/* ─── Light theme (default) ─────────────────────────────── */
+/* ─── Light theme — warm ivory & emerald (Delux Hotels) ──── */
 :root {
-  --c-bg: 240 242 245;      /* WhatsApp light gray */
-  --c-surface: 255 255 255; /* white panels */
-  --c-elevated: 240 242 245;/* inputs / hover */
-  --c-border: 222 226 230;
-  --c-text: 17 27 33;
-  --c-muted: 102 117 128;
+  --c-bg: 244 240 231;       /* ivory parchment */
+  --c-surface: 255 254 250;  /* warm white */
+  --c-elevated: 236 230 216; /* sand */
+  --c-border: 219 210 191;   /* soft taupe */
+  --c-text: 23 28 25;        /* near-black green-tinted */
+  --c-muted: 92 86 74;       /* darker warm gray for readable contrast */
 }
 
-/* ─── Dark theme ────────────────────────────────────────── */
+/* ─── Dark theme — deep forest & champagne ──────────────── */
 html.dark {
-  --c-bg: 11 14 17;         /* WhatsApp dark */
-  --c-surface: 17 23 28;
-  --c-elevated: 32 44 51;
-  --c-border: 38 49 56;
-  --c-text: 233 237 239;
-  --c-muted: 142 154 162;
+  --c-bg: 16 20 18;          /* warm near-black */
+  --c-surface: 23 28 25;     /* deep charcoal green */
+  --c-elevated: 33 40 35;
+  --c-border: 46 54 48;
+  --c-text: 237 231 216;     /* warm ivory text */
+  --c-muted: 154 148 129;    /* champagne-gray */
 }
 
 html, body, #root {
@@ -29,16 +29,96 @@ html, body, #root {
 body {
   background-color: rgb(var(--c-bg));
   color: rgb(var(--c-text));
-  font-family: system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  font-family: 'DM Sans', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Elegant serif ONLY for explicitly-marked display headings.
+   (Small h3 UI labels stay in DM Sans for legibility.) */
+.font-display {
+  font-family: 'Cormorant Garamond', Georgia, 'Times New Roman', serif;
+  letter-spacing: 0.01em;
+}
+
+/* Gold hairline accent utility */
+.gold-rule {
+  background: linear-gradient(90deg, transparent, rgb(201 162 39 / 0.6), transparent);
+  height: 1px;
 }
 
 /* WhatsApp-style chat wallpaper for the conversation panel */
 .wa-chat-bg {
   background-color: rgb(var(--c-bg));
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='40' viewBox='0 0 40 40'%3E%3Cg fill='%23808080' fill-opacity='0.04'%3E%3Cpath d='M0 0h20v20H0zM20 20h20v20H20z'/%3E%3C/g%3E%3C/svg%3E");
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='44' height='44' viewBox='0 0 44 44'%3E%3Cg fill='%23C9A227' fill-opacity='0.045'%3E%3Cpath d='M22 0l5 5-5 5-5-5zM0 22l5 5-5 5zM44 22l-5 5 5 5z'/%3E%3C/g%3E%3C/svg%3E");
 }
 
-/* Subtle scrollbars */
+/* Refined scrollbars */
 ::-webkit-scrollbar { width: 8px; height: 8px; }
 ::-webkit-scrollbar-thumb { background: rgb(var(--c-border)); border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: rgb(201 162 39 / 0.5); }
 ::-webkit-scrollbar-track { background: transparent; }
+
+/* ─── Motion system ─────────────────────────────────────── */
+@keyframes fade-up {
+  from { opacity: 0; transform: translateY(14px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes fade-in { from { opacity: 0; } to { opacity: 1; } }
+@keyframes float-slow {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(-6px); }
+}
+@keyframes gold-sweep {
+  0%   { background-position: -150% 0; }
+  100% { background-position: 250% 0; }
+}
+@keyframes pulse-ring {
+  0%   { box-shadow: 0 0 0 0 rgb(201 162 39 / 0.45); }
+  70%  { box-shadow: 0 0 0 8px rgb(201 162 39 / 0); }
+  100% { box-shadow: 0 0 0 0 rgb(201 162 39 / 0); }
+}
+
+.animate-fade-up { animation: fade-up 0.55s cubic-bezier(0.22, 1, 0.36, 1) both; }
+.animate-fade-in { animation: fade-in 0.6s ease both; }
+.float-slow { animation: float-slow 6s ease-in-out infinite; }
+.pulse-ring { animation: pulse-ring 2s ease-out infinite; }
+
+/* Card hover lift */
+.card-lift {
+  transition: transform 0.28s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.28s ease, border-color 0.28s ease;
+  will-change: transform;
+}
+.card-lift:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 16px 40px -18px rgb(14 77 56 / 0.45);
+  border-color: rgb(201 162 39 / 0.45);
+}
+
+/* Animated gold underline on hover */
+.gold-underline { position: relative; }
+.gold-underline::after {
+  content: '';
+  position: absolute; left: 0; bottom: -2px;
+  width: 0; height: 1.5px;
+  background: linear-gradient(90deg, rgb(201 162 39), rgb(224 198 107));
+  transition: width 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.gold-underline:hover::after { width: 100%; }
+
+/* Button press micro-interaction */
+button { transition: transform 0.12s ease, background-color 0.2s ease, box-shadow 0.2s ease; }
+button:active:not(:disabled) { transform: scale(0.97); }
+
+/* Shimmering gold text accent */
+.shimmer-gold {
+  background: linear-gradient(90deg, rgb(201 162 39), rgb(240 224 160), rgb(201 162 39));
+  background-size: 200% auto;
+  -webkit-background-clip: text; background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: gold-sweep 6s linear infinite;
+}
+
+/* Respect reduced-motion preference */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; }
+}

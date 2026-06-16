@@ -29,28 +29,34 @@ export default function App() {
   return (
     <div className="flex h-screen overflow-hidden bg-app-bg text-app-text">
       {/* Sidebar */}
-      <aside className="w-60 bg-app-surface border-r border-app-border flex flex-col shrink-0">
-        {/* Brand header — WhatsApp green */}
-        <div className="px-4 py-4 bg-wa-dark text-white flex items-center gap-3">
-          <div className="w-9 h-9 rounded-full bg-white/15 flex items-center justify-center">
-            <MessageCircle size={18} className="text-white" />
+      <aside className="w-64 bg-app-surface border-r border-app-border flex flex-col shrink-0">
+        {/* Brand header — deep emerald with gold monogram */}
+        <div className="relative px-5 py-6 bg-gradient-to-br from-brand-emerald to-brand-emeraldDark text-white overflow-hidden">
+          <div className="absolute -right-6 -top-6 w-24 h-24 rounded-full bg-brand-gold/10 float-slow" />
+          <div className="relative flex items-center gap-3">
+            <div className="w-11 h-11 rounded-full border border-brand-gold/60 flex items-center justify-center shrink-0 pulse-ring">
+              <span className="font-display text-2xl font-semibold text-brand-goldSoft leading-none">D</span>
+            </div>
+            <div className="min-w-0">
+              <h1 className="font-display text-xl font-semibold leading-tight tracking-wide">Delux Hotels</h1>
+              <p className="text-[10px] uppercase tracking-[0.18em] text-brand-goldSoft/80">{t('app_subtitle')}</p>
+            </div>
           </div>
-          <div>
-            <h1 className="text-sm font-bold leading-tight">{t('app_title')}</h1>
-            <p className="text-[11px] text-white/70">{t('app_subtitle')}</p>
-          </div>
+          <p className="relative mt-3 font-display italic text-[13px] text-white/75 leading-snug">
+            ¡Dónde nuestra mejor satisfacción es su disfrute!
+          </p>
         </div>
 
-        <nav className="flex-1 px-2 py-4 space-y-1 overflow-y-auto">
+        <nav className="flex-1 px-3 py-5 space-y-1 overflow-y-auto">
           {navItems.map(({ to, key, icon: Icon, exact }) => (
             <NavLink
               key={to}
               to={to}
               end={exact}
               className={({ isActive }) =>
-                `flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-colors ${
+                `relative flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-all ${
                   isActive
-                    ? 'bg-wa/15 text-wa-dark dark:text-wa font-medium'
+                    ? 'bg-brand-emerald/8 text-brand-emerald dark:text-brand-goldSoft font-semibold before:absolute before:left-0 before:top-1.5 before:bottom-1.5 before:w-0.5 before:rounded-full before:bg-brand-gold'
                     : 'text-app-muted hover:text-app-text hover:bg-app-elevated'
                 }`
               }
@@ -73,7 +79,7 @@ export default function App() {
                 onClick={() => setTheme(value)}
                 title={label}
                 className={`flex-1 flex items-center justify-center gap-1 py-1.5 rounded-lg text-[11px] font-medium transition-colors ${
-                  theme === value ? 'bg-wa text-white' : 'bg-app-elevated text-app-muted hover:text-app-text'
+                  theme === value ? 'bg-brand-emerald text-white' : 'bg-app-elevated text-app-muted hover:text-app-text'
                 }`}
               >
                 <Icon size={13} />
@@ -91,7 +97,7 @@ export default function App() {
             <button
               onClick={() => setLang('es')}
               className={`flex-1 py-1.5 rounded-lg text-xs font-medium transition-colors ${
-                lang === 'es' ? 'bg-wa text-white' : 'bg-app-elevated text-app-muted hover:text-app-text'
+                lang === 'es' ? 'bg-brand-emerald text-white' : 'bg-app-elevated text-app-muted hover:text-app-text'
               }`}
             >
               Español
@@ -99,7 +105,7 @@ export default function App() {
             <button
               onClick={() => setLang('en')}
               className={`flex-1 py-1.5 rounded-lg text-xs font-medium transition-colors ${
-                lang === 'en' ? 'bg-wa text-white' : 'bg-app-elevated text-app-muted hover:text-app-text'
+                lang === 'en' ? 'bg-brand-emerald text-white' : 'bg-app-elevated text-app-muted hover:text-app-text'
               }`}
             >
               English

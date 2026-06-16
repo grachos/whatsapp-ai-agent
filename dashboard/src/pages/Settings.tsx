@@ -26,8 +26,8 @@ export default function SettingsPage() {
   });
 
   return (
-    <div className="p-6 space-y-6">
-      <h2 className="text-xl font-semibold">{t('settings')}</h2>
+    <div className="p-8 space-y-6 animate-fade-up">
+      <h2 className="font-display text-3xl font-semibold tracking-wide">{t('settings')}</h2>
 
       {/* Prompt Editor */}
       <div className="bg-app-surface border border-app-border rounded-xl p-5 space-y-3">
@@ -39,7 +39,7 @@ export default function SettingsPage() {
           <button
             onClick={() => saveMut.mutate()}
             disabled={saveMut.isPending}
-            className="flex items-center gap-2 bg-green-600 hover:bg-green-500 text-white text-sm px-3 py-2 rounded-lg"
+            className="flex items-center gap-2 bg-brand-emerald hover:bg-brand-emeraldDark text-white text-sm px-3 py-2 rounded-lg"
           >
             {saved ? <CheckCircle size={14} /> : <Save size={14} />}
             {saved ? t('saved') : saveMut.isPending ? t('saving') : t('save_prompt')}
@@ -81,7 +81,7 @@ export default function SettingsPage() {
             <div className="grid grid-cols-2 gap-3">
               <div>
                 <p className="text-xs text-app-muted">Conflicts</p>
-                <p className={syncData.report.conflicts.length > 0 ? 'text-red-400 font-medium' : 'text-green-400'}>
+                <p className={syncData.report.conflicts.length > 0 ? 'text-red-400 font-medium' : 'text-brand-emeraldLight'}>
                   {syncData.report.conflicts.length}
                 </p>
                 {syncData.report.conflicts.map(c => (
@@ -96,7 +96,7 @@ export default function SettingsPage() {
               </div>
               <div>
                 <p className="text-xs text-app-muted">Auto-repaired</p>
-                <p className="text-green-400">{syncData.report.repairedCount}</p>
+                <p className="text-brand-emeraldLight">{syncData.report.repairedCount}</p>
               </div>
               <div>
                 <p className="text-xs text-app-muted">Errors</p>
@@ -186,7 +186,7 @@ function BusinessConfigEditor() {
             <button
               onClick={() => saveMut.mutate(row)}
               disabled={!row.key.trim() || savingKey === row.key}
-              className="bg-green-600 hover:bg-green-500 disabled:opacity-40 text-white text-xs px-3 py-1.5 rounded-lg"
+              className="bg-brand-emerald hover:bg-brand-emeraldDark disabled:opacity-40 text-white text-xs px-3 py-1.5 rounded-lg"
             >
               {savingKey === row.key ? '...' : t('save')}
             </button>

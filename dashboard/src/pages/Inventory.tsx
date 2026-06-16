@@ -5,7 +5,7 @@ import { getInventory, saveAccommodation, Accommodation } from '../lib/api';
 import { useI18n } from '../lib/i18n';
 
 const STATUS_COLORS: Record<string, string> = {
-  Active: 'bg-green-600/20 text-green-400',
+  Active: 'bg-brand-emerald/15 text-brand-emeraldLight',
   Inactive: 'bg-app-elevated text-app-muted',
   Maintenance: 'bg-yellow-600/20 text-yellow-400',
 };
@@ -24,12 +24,12 @@ export default function InventoryPage() {
   const { data, isLoading } = useQuery({ queryKey: ['inventory'], queryFn: getInventory });
 
   return (
-    <div className="p-6 space-y-4">
+    <div className="p-8 space-y-6 animate-fade-up">
       <div className="flex items-center justify-between">
-        <h2 className="text-xl font-semibold">{t('property_inventory')}</h2>
+        <h2 className="font-display text-3xl font-semibold tracking-wide">{t('property_inventory')}</h2>
         <button
           onClick={() => setEditing({ ...EMPTY })}
-          className="flex items-center gap-2 bg-green-600 hover:bg-green-500 text-white text-sm px-3 py-2 rounded-lg"
+          className="flex items-center gap-2 bg-brand-emerald hover:bg-brand-emeraldDark text-white text-sm px-3 py-2 rounded-lg"
         >
           <Plus size={14} /> {t('add_accommodation')}
         </button>
@@ -38,9 +38,11 @@ export default function InventoryPage() {
       {isLoading ? (
         <p className="text-app-muted text-sm">{t('loading')}</p>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
-          {(data?.accommodations ?? []).map(acc => (
-            <div key={acc.accommodation_id} className="bg-app-surface border border-app-border rounded-xl p-4 space-y-3">
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
+          {(data?.accommodations ?? []).map((acc, i) => (
+            <div key={acc.accommodation_id}
+              className="bg-app-surface border border-app-border rounded-2xl p-5 space-y-3 card-lift animate-fade-up"
+              style={{ animationDelay: `${i * 70}ms` }}>
               <div className="flex items-start justify-between">
                 <div>
                   <h3 className="font-medium">{acc.name}</h3>
@@ -164,7 +166,7 @@ function AccommodationModal({
 
         {mut.isError && <p className="text-red-400 text-xs mt-3">{(mut.error as Error).message}</p>}
         <button onClick={() => mut.mutate()} disabled={mut.isPending}
-          className="w-full mt-5 bg-green-600 hover:bg-green-500 text-white py-2 rounded-lg text-sm font-medium">
+          className="w-full mt-5 bg-brand-emerald hover:bg-brand-emeraldDark text-white py-2 rounded-lg text-sm font-medium">
           {mut.isPending ? t('saving') : t('save_accommodation')}
         </button>
       </div>

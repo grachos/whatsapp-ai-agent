@@ -68,17 +68,24 @@ export default function DashboardPage() {
   const currentMode = modeData?.mode ?? 'ai';
 
   return (
-    <div className="p-6 space-y-6">
-      <h2 className="text-xl font-semibold">{t('nav_overview')}</h2>
+    <div className="p-8 space-y-8">
+      {/* Editorial hero */}
+      <header className="animate-fade-up">
+        <p className="text-[11px] uppercase tracking-[0.3em] text-brand-gold mb-1">Delux Hotels</p>
+        <h2 className="font-display text-4xl md:text-5xl font-semibold tracking-wide leading-none">
+          {t('nav_overview')}
+        </h2>
+        <div className="gold-rule w-24 mt-3" />
+      </header>
 
       {/* Status cards */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
         {/* WhatsApp */}
-        <div className="bg-app-surface rounded-xl p-4 border border-app-border">
+        <div className="bg-app-surface rounded-2xl p-5 border border-app-border card-lift animate-fade-up" style={{ animationDelay: '60ms' }}>
           <div className="flex items-center justify-between mb-3">
-            <span className="text-sm text-app-muted">{t('whatsapp')}</span>
+            <span className="text-[11px] uppercase tracking-widest text-app-muted">{t('whatsapp')}</span>
             {status?.connected
-              ? <span className="flex items-center gap-1 text-green-400 text-xs"><Wifi size={12}/> {t('connected')}</span>
+              ? <span className="flex items-center gap-1 text-brand-emeraldLight text-xs"><Wifi size={12}/> {t('connected')}</span>
               : <span className="flex items-center gap-1 text-red-400 text-xs"><WifiOff size={12}/> {t('disconnected')}</span>
             }
           </div>
@@ -105,13 +112,13 @@ export default function DashboardPage() {
         </div>
 
         {/* Default Agent Mode */}
-        <div className="bg-app-surface rounded-xl p-4 border border-app-border">
-          <p className="text-sm text-app-muted mb-3">{t('default_agent_mode')}</p>
+        <div className="bg-app-surface rounded-2xl p-5 border border-app-border card-lift animate-fade-up" style={{ animationDelay: '140ms' }}>
+          <p className="text-[11px] uppercase tracking-widest text-app-muted mb-3">{t('default_agent_mode')}</p>
           <div className="flex gap-2">
             <button
               onClick={() => modeMutation.mutate('ai')}
               className={`flex-1 flex items-center justify-center gap-2 py-2 rounded-lg text-sm font-medium transition-colors ${
-                currentMode === 'ai' ? 'bg-green-600 text-white' : 'bg-app-elevated text-app-muted hover:bg-app-border'
+                currentMode === 'ai' ? 'bg-brand-emerald text-white' : 'bg-app-elevated text-app-muted hover:bg-app-border'
               }`}
             >
               <Bot size={14}/> {t('mode_ai')}
@@ -132,9 +139,9 @@ export default function DashboardPage() {
         </div>
 
         {/* Sync */}
-        <div className="bg-app-surface rounded-xl p-4 border border-app-border">
+        <div className="bg-app-surface rounded-2xl p-5 border border-app-border card-lift animate-fade-up" style={{ animationDelay: '220ms' }}>
           <div className="flex items-center justify-between mb-3">
-            <span className="text-sm text-app-muted">{t('sync_status')}</span>
+            <span className="text-[11px] uppercase tracking-widest text-app-muted">{t('sync_status')}</span>
             <button
               onClick={() => syncMutation.mutate()}
               disabled={syncMutation.isPending}
@@ -146,7 +153,7 @@ export default function DashboardPage() {
           {syncReport?.report ? (
             <div className="space-y-1 text-xs">
               <p className="text-app-muted">{t('last_run')}: {new Date(syncReport.report.ranAt).toLocaleString()}</p>
-              <p className={syncReport.report.conflicts.length > 0 ? 'text-red-400' : 'text-green-400'}>
+              <p className={syncReport.report.conflicts.length > 0 ? 'text-red-400' : 'text-brand-emeraldLight'}>
                 {syncReport.report.conflicts.length > 0
                   ? `⚠️ ${syncReport.report.conflicts.length} ${t('conflicts')}`
                   : `✓ ${t('no_conflicts')}`}
@@ -160,10 +167,10 @@ export default function DashboardPage() {
       </div>
 
       {/* Live message feed */}
-      <div className="bg-app-surface rounded-xl border border-app-border">
-        <div className="flex items-center gap-2 px-4 py-3 border-b border-app-border">
-          <Zap size={14} className="text-yellow-400" />
-          <span className="text-sm font-medium">{t('live_feed')}</span>
+      <div className="bg-app-surface rounded-2xl border border-app-border animate-fade-up" style={{ animationDelay: '300ms' }}>
+        <div className="flex items-center gap-2 px-5 py-3.5 border-b border-app-border">
+          <Zap size={14} className="text-brand-gold" />
+          <span className="text-[11px] uppercase tracking-widest font-medium">{t('live_feed')}</span>
           <span className="ml-auto text-xs text-app-muted">{logs.length} {t('messages')}</span>
         </div>
         <div className="h-64 overflow-y-auto p-4 space-y-2 font-mono">
@@ -171,7 +178,7 @@ export default function DashboardPage() {
             <p className="text-xs text-app-muted text-center mt-8">{t('waiting_messages')}</p>
           )}
           {logs.map((log, i) => (
-            <div key={i} className={`text-xs flex gap-3 ${log.type === 'incoming' ? 'text-blue-300' : 'text-green-300'}`}>
+            <div key={i} className={`text-xs flex gap-3 ${log.type === 'incoming' ? 'text-blue-300' : 'text-brand-emeraldLight'}`}>
               <span className="text-app-muted shrink-0">{new Date(log.timestamp).toLocaleTimeString()}</span>
               <span className="text-app-muted shrink-0">{log.type === 'incoming' ? '←' : '→'}</span>
               <span className="text-app-muted shrink-0">{log.phone}</span>

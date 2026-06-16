@@ -5,7 +5,7 @@ import { getReservations, cancelReservation, createReservation, modifyReservatio
 import { useI18n } from '../lib/i18n';
 
 const STATUS_COLORS: Record<string, string> = {
-  Confirmed: 'bg-green-600/20 text-green-400',
+  Confirmed: 'bg-brand-emerald/15 text-brand-emeraldLight',
   Pending: 'bg-yellow-600/20 text-yellow-400',
   Cancelled: 'bg-red-600/20 text-red-400',
 };
@@ -30,12 +30,12 @@ export default function ReservationsPage() {
   );
 
   return (
-    <div className="p-6 space-y-4">
+    <div className="p-8 space-y-6 animate-fade-up">
       <div className="flex items-center justify-between">
-        <h2 className="text-xl font-semibold">{t('nav_reservations')}</h2>
+        <h2 className="font-display text-3xl font-semibold tracking-wide">{t('nav_reservations')}</h2>
         <button
           onClick={() => setShowCreate(true)}
-          className="flex items-center gap-2 bg-green-600 hover:bg-green-500 text-white text-sm px-3 py-2 rounded-lg"
+          className="flex items-center gap-2 bg-brand-emerald hover:bg-brand-emeraldDark text-white text-sm px-3 py-2 rounded-lg"
         >
           <Plus size={14} /> {t('new_reservation')}
         </button>
@@ -163,7 +163,7 @@ function CreateModal({ onClose }: { onClose: () => void }) {
         <button
           onClick={() => mut.mutate()}
           disabled={mut.isPending}
-          className="w-full bg-green-600 hover:bg-green-500 text-white py-2 rounded-lg text-sm font-medium"
+          className="w-full bg-brand-emerald hover:bg-brand-emeraldDark text-white py-2 rounded-lg text-sm font-medium"
         >
           {mut.isPending ? t('creating') : t('create_reservation_btn')}
         </button>

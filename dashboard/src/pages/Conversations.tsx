@@ -93,12 +93,12 @@ export default function ConversationsPage() {
                 <span className="text-sm font-medium truncate">{c.number}</span>
                 <div className="flex items-center gap-1.5 shrink-0">
                   <span className={`text-[10px] px-1.5 py-0.5 rounded-full ${
-                    c.mode === 'human' ? 'bg-amber-600/20 text-amber-400' : 'bg-green-600/20 text-green-400'
+                    c.mode === 'human' ? 'bg-amber-600/20 text-amber-400' : 'bg-brand-emerald/15 text-brand-emeraldLight'
                   }`}>
                     {c.mode === 'human' ? t('mode_human') : t('mode_ai')}
                   </span>
                   {c.unread > 0 && selected !== c.jid && (
-                    <span className="bg-green-600 text-white text-xs px-1.5 rounded-full">{c.unread}</span>
+                    <span className="bg-brand-gold text-white text-xs px-1.5 rounded-full">{c.unread}</span>
                   )}
                 </div>
               </div>
@@ -121,7 +121,7 @@ export default function ConversationsPage() {
                 <button
                   onClick={() => setMode(selected, 'ai')}
                   className={`flex items-center gap-1.5 px-3 py-1 rounded-md text-xs font-medium transition-colors ${
-                    !isHuman ? 'bg-green-600 text-white' : 'text-app-muted hover:text-app-text'
+                    !isHuman ? 'bg-brand-emerald text-white' : 'text-app-muted hover:text-app-text'
                   }`}
                 >
                   <Bot size={12} /> {t('mode_ai')}
@@ -160,7 +160,7 @@ export default function ConversationsPage() {
                 <button
                   onClick={() => sendMut.mutate()}
                   disabled={!draft.trim() || sendMut.isPending}
-                  className="bg-green-600 hover:bg-green-500 disabled:opacity-40 text-white px-4 rounded-lg flex items-center gap-2 text-sm"
+                  className="bg-brand-emerald hover:bg-brand-emeraldDark disabled:opacity-40 text-white px-4 rounded-lg flex items-center gap-2 text-sm"
                 >
                   <Send size={14} /> {t('send')}
                 </button>
