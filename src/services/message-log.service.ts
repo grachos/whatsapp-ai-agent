@@ -74,6 +74,15 @@ export function getMessages(jid: string): LoggedMessage[] {
   return conversations.get(jid) ?? [];
 }
 
+// Most recent messages across ALL conversations, oldest→newest, capped at `limit`.
+// Used to backfill the dashboard live feed so it isn't blank on page load.
+export function getRecentMessages(limit = 50): LoggedMessage[] {
+  const all: LoggedMessage[] = [];
+  for (const list of conversations.values()) all.push(...list);
+  all.sort((a, b) => a.timestamp.localeCompare(b.timestamp));
+  return all.slice(-limit);
+}
+
 export function markRead(jid: string): void {
   unreadCounts.set(jid, 0);
 }

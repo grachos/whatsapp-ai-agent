@@ -6,6 +6,7 @@ import reservationsRouter from './routes/reservations';
 import inventoryRouter from './routes/inventory';
 import syncRouter from './routes/sync';
 import configRouter from './routes/config';
+import transcriptionsRouter from './routes/transcriptions';
 import { eventEmitter } from '../utils/events';
 import { config } from '../config';
 
@@ -36,13 +37,16 @@ router.get('/events', (req: Request, res: Response) => {
 
   const onIncoming = (d: unknown) => send('message:incoming', d);
   const onOutgoing = (d: unknown) => send('message:outgoing', d);
+  const onTranscription = (d: unknown) => send('voice:transcription', d);
 
   eventEmitter.on('message:incoming', onIncoming);
   eventEmitter.on('message:outgoing', onOutgoing);
+  eventEmitter.on('voice:transcription', onTranscription);
 
   req.on('close', () => {
     eventEmitter.off('message:incoming', onIncoming);
     eventEmitter.off('message:outgoing', onOutgoing);
+    eventEmitter.off('voice:transcription', onTranscription);
   });
 
   // Keep-alive ping every 30s
@@ -57,5 +61,6 @@ router.use('/reservations', requireApiKey, reservationsRouter);
 router.use('/inventory', requireApiKey, inventoryRouter);
 router.use('/sync', requireApiKey, syncRouter);
 router.use('/config', requireApiKey, configRouter);
+router.use('/transcriptions', requireApiKey, transcriptionsRouter);
 
 export default router;

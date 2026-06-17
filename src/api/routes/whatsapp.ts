@@ -1,7 +1,7 @@
 import { Router, Request, Response, NextFunction } from 'express';
 import QRCode from 'qrcode';
 import { getStatus, sendMessage, resetWhatsApp } from '../../integrations/whatsapp/client';
-import { getConversations, getMessages, markRead, logMessage, displayNumber } from '../../services/message-log.service';
+import { getConversations, getMessages, getRecentMessages, markRead, logMessage, displayNumber } from '../../services/message-log.service';
 import { setConversationMode, getConversationMode } from '../../services/conversation-mode.service';
 
 const router = Router();
@@ -32,6 +32,12 @@ router.post('/reset', async (_req: Request, res: Response, next: NextFunction) =
     resetWhatsApp().catch(() => { /* logged internally */ });
     res.json({ success: true, message: 'WhatsApp session reset — a new QR will appear shortly' });
   } catch (err) { next(err); }
+});
+
+// Recent messages across all chats — backfills the dashboard live feed on load
+router.get('/recent', (req: Request, res: Response) => {
+  const limit = Math.min(parseInt(req.query.limit as string) || 50, 200);
+  res.json({ messages: getRecentMessages(limit) });
 });
 
 // List all conversations (most recent first)

@@ -21,6 +21,8 @@ async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
 export const getWhatsAppStatus = () => request<{ connected: boolean; phoneNumber: string | null }>('/whatsapp/status');
 export const getQR = () => request<{ connected: boolean; qr: string | null }>('/whatsapp/qr');
 export const resetWhatsApp = () => request<{ success: boolean }>('/whatsapp/reset', { method: 'POST' });
+export const getRecentMessages = (limit = 50) =>
+  request<{ messages: LoggedMessage[] }>(`/whatsapp/recent?limit=${limit}`);
 
 // Conversations (identified by full JID — must be URL-encoded in the path)
 export const getConversations = () =>
@@ -64,6 +66,10 @@ export const saveAccommodation = (acc: Accommodation) =>
 // Sync
 export const runSync = () => request<{ report: SyncReport }>('/sync/run', { method: 'POST' });
 export const getSyncReport = () => request<{ report: SyncReport }>('/sync/report');
+
+// Transcriptions
+export const getTranscriptions = (limit = 50) =>
+  request<{ transcriptions: VoiceTranscription[] }>(`/transcriptions?limit=${limit}`);
 
 // Types
 export interface Reservation {
@@ -124,6 +130,16 @@ export interface LoggedMessage {
   text: string;
   timestamp: string;
   via: 'ai' | 'human' | 'guest' | 'system';
+}
+
+export interface VoiceTranscription {
+  id: string;
+  phone: string;
+  jid: string;
+  transcript: string;
+  durationSecs: number | null;
+  mimeType: string;
+  timestamp: string;
 }
 
 export interface SyncReport {

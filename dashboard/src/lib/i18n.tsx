@@ -37,6 +37,13 @@ const dict: Dict = {
   messages: { en: 'messages', es: 'mensajes' },
   waiting_messages: { en: 'Waiting for messages...', es: 'Esperando mensajes...' },
 
+  // Voice transcriptions
+  voice_transcriptions: { en: 'Voice Transcriptions', es: 'Transcripciones de Voz' },
+  total: { en: 'total', es: 'en total' },
+  no_voice_messages: { en: 'No voice messages yet.', es: 'Aún no hay mensajes de voz.' },
+  voice_hint_enabled: { en: 'Voice notes sent to the agent will appear here with their transcript.', es: 'Las notas de voz enviadas al agente aparecerán aquí con su transcripción.' },
+  voice_hint_disabled: { en: 'Set GROQ_API_KEY in .env.local to enable transcription.', es: 'Configura GROQ_API_KEY en .env.local para habilitar la transcripción.' },
+
   // Modes
   mode_ai: { en: 'AI', es: 'IA' },
   mode_human: { en: 'Human', es: 'Humano' },

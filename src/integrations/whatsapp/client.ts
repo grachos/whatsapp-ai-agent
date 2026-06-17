@@ -2,8 +2,10 @@ import makeWASocket, {
   DisconnectReason,
   useMultiFileAuthState,
   fetchLatestBaileysVersion,
+  downloadMediaMessage,
   Browsers,
   WASocket,
+  WAMessage,
   WAMessageContent,
   WAMessageKey,
 } from '@whiskeysockets/baileys';
@@ -12,6 +14,9 @@ import path from 'path';
 import fs from 'fs';
 import { logger } from '../../utils/logger';
 import { sleep } from '../../utils/retry';
+import { isTranscriptionEnabled, transcribeAudio } from '../groq/whisper';
+import { addTranscription } from '../../services/transcription-store';
+import { displayNumber } from '../../services/message-log.service';
 
 export interface WhatsAppStatus {
   connected: boolean;
@@ -230,7 +235,7 @@ export async function connectWhatsApp(): Promise<void> {
         from = senderPn.includes('@') ? senderPn : `${senderPn}@s.whatsapp.net`;
       }
 
-      const text =
+      let text =
         msg.message.conversation ||
         msg.message.extendedTextMessage?.text ||
         msg.message.imageMessage?.caption ||
@@ -238,6 +243,12 @@ export async function connectWhatsApp(): Promise<void> {
         msg.message.buttonsResponseMessage?.selectedDisplayText ||
         msg.message.listResponseMessage?.title ||
         '';
+
+      // Voice notes / audio: transcribe to text and feed into the same handler.
+      const audio = msg.message.audioMessage;
+      if (!text.trim() && audio) {
+        text = await handleVoiceNote(msg, from);
+      }
 
       if (!text.trim()) {
         logger.debug(`Skipping message from ${from}: no extractable text (type=${Object.keys(msg.message).join(',')})`);
@@ -255,4 +266,56 @@ export async function connectWhatsApp(): Promise<void> {
       }
     }
   });
+}
+
+// ─── Voice note handling ─────────────────────────────────
+// Downloads the audio, transcribes it via Groq Whisper, returns the text.
+// If transcription is disabled or fails, sends a polite text fallback and returns ''
+// so the message gets skipped (no AI call on empty text).
+async function handleVoiceNote(msg: WAMessage, from: string): Promise<string> {
+  logger.info(`Voice note received from ${from}`);
+
+  if (!isTranscriptionEnabled()) {
+    logger.warn('Voice transcription disabled (no GROQ_API_KEY) — sending fallback');
+    try {
+      await sock?.sendMessage(from, {
+        text: 'Por ahora solo puedo procesar mensajes de texto. ¿Podrías escribir tu consulta?\n\n' +
+              'For now I can only process text messages. Could you please type your message?',
+      });
+    } catch { /* ignore */ }
+    return '';
+  }
+
+  try {
+    const buffer = await downloadMediaMessage(msg, 'buffer', {});
+    if (!buffer || !(buffer instanceof Buffer)) {
+      throw new Error('Empty audio buffer');
+    }
+    const mime = msg.message?.audioMessage?.mimetype ?? 'audio/ogg';
+    const durationSecs = msg.message?.audioMessage?.seconds ?? null;
+    const transcript = await transcribeAudio(buffer, mime);
+    if (!transcript.trim()) {
+      throw new Error('Empty transcript');
+    }
+
+    addTranscription({
+      phone: displayNumber(from),
+      jid: from,
+      transcript,
+      durationSecs,
+      mimeType: mime,
+      timestamp: new Date().toISOString(),
+    });
+
+    return transcript;
+  } catch (err) {
+    logger.error(`Voice transcription failed for ${from}`, { err: err instanceof Error ? err.message : err });
+    try {
+      await sock?.sendMessage(from, {
+        text: 'No pude entender tu nota de voz. ¿Podrías escribirla?\n\n' +
+              "I couldn't understand your voice note. Could you type it instead?",
+      });
+    } catch { /* ignore */ }
+    return '';
+  }
 }

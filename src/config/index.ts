@@ -14,6 +14,11 @@ const schema = z.object({
   OPENROUTER_MODEL: z.string().default('openai/gpt-4o-mini'),
   OPENROUTER_BASE_URL: z.string().url().default('https://openrouter.ai/api/v1'),
 
+  // Optional — enables voice-note transcription via Groq Whisper.
+  // Without it, voice notes get a polite "voice not supported" reply.
+  GROQ_API_KEY: z.string().optional(),
+  GROQ_WHISPER_MODEL: z.string().default('whisper-large-v3-turbo'),
+
   GOOGLE_SERVICE_ACCOUNT_EMAIL: z.string().email('Invalid Google service account email'),
   GOOGLE_PRIVATE_KEY: z.string().min(1, 'GOOGLE_PRIVATE_KEY is required'),
 
@@ -48,6 +53,11 @@ export const config = {
     apiKey: parsed.data.OPENROUTER_API_KEY,
     model: parsed.data.OPENROUTER_MODEL,
     baseUrl: parsed.data.OPENROUTER_BASE_URL,
+  },
+
+  groq: {
+    apiKey: parsed.data.GROQ_API_KEY,
+    whisperModel: parsed.data.GROQ_WHISPER_MODEL,
   },
 
   google: {
