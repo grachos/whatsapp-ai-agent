@@ -1,9 +1,9 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useState, useEffect, useRef } from 'react';
-import { Send, Bot, User, MessageCircle } from 'lucide-react';
+import { Send, Bot, User, MessageCircle, Languages } from 'lucide-react';
 import {
   getConversations, getConversationMessages, sendManualMessage,
-  setConversationMode, LoggedMessage,
+  setConversationMode, translateText, LoggedMessage,
 } from '../lib/api';
 import { useI18n } from '../lib/i18n';
 
@@ -34,6 +34,12 @@ export default function ConversationsPage() {
       qc.invalidateQueries({ queryKey: ['conversation', selected] });
       qc.invalidateQueries({ queryKey: ['conversations'] });
     },
+  });
+
+  // Translate the current draft in place (ES↔EN, auto-detected)
+  const translateMut = useMutation({
+    mutationFn: () => translateText(draft.trim()),
+    onSuccess: ({ translated }) => { if (translated) setDraft(translated); },
   });
 
   // Optimistic per-chat mode so the toggle reacts instantly
@@ -153,19 +159,32 @@ export default function ConversationsPage() {
                 <input
                   value={draft}
                   onChange={e => setDraft(e.target.value)}
-                  onKeyDown={e => { if (e.key === 'Enter' && draft.trim()) sendMut.mutate(); }}
-                  placeholder={t('type_reply')}
-                  className="flex-1 bg-app-elevated border border-app-border rounded-lg px-4 py-2 text-sm focus:outline-none focus:border-app-muted"
+                  onKeyDown={e => { if (e.key === 'Enter' && isHuman && draft.trim()) sendMut.mutate(); }}
+                  placeholder={isHuman ? t('type_reply') : t('ai_mode_disabled_input')}
+                  disabled={!isHuman}
+                  className="flex-1 bg-app-elevated border border-app-border rounded-lg px-4 py-2 text-sm focus:outline-none focus:border-app-muted disabled:opacity-50 disabled:cursor-not-allowed"
                 />
+                {isHuman && (
+                  <button
+                    onClick={() => translateMut.mutate()}
+                    disabled={!draft.trim() || translateMut.isPending}
+                    title={t('translate')}
+                    className="bg-app-elevated border border-app-border hover:border-app-muted disabled:opacity-40 text-app-text px-3 rounded-lg flex items-center gap-2 text-sm"
+                  >
+                    <Languages size={14} className={translateMut.isPending ? 'animate-pulse' : ''} />
+                    {translateMut.isPending ? t('translating') : t('translate')}
+                  </button>
+                )}
                 <button
                   onClick={() => sendMut.mutate()}
-                  disabled={!draft.trim() || sendMut.isPending}
-                  className="bg-brand-emerald hover:bg-brand-emeraldDark disabled:opacity-40 text-white px-4 rounded-lg flex items-center gap-2 text-sm"
+                  disabled={!isHuman || !draft.trim() || sendMut.isPending}
+                  className="bg-brand-emerald hover:bg-brand-emeraldDark disabled:opacity-40 disabled:cursor-not-allowed text-white px-4 rounded-lg flex items-center gap-2 text-sm"
                 >
                   <Send size={14} /> {t('send')}
                 </button>
               </div>
               {sendMut.isError && <p className="text-red-400 text-xs mt-2">{(sendMut.error as Error).message}</p>}
+              {translateMut.isError && <p className="text-red-400 text-xs mt-2">{(translateMut.error as Error).message}</p>}
             </div>
           </>
         ) : (

@@ -46,8 +46,18 @@ export function getSystemPrompt(): string {
   return DEFAULT_SYSTEM_PROMPT;
 }
 
-async function buildSystemPrompt(): Promise<string> {
+async function buildSystemPrompt(isFirstMessage: boolean): Promise<string> {
   let base = getSystemPrompt();
+
+  // Runtime turn signal so the slogan/greeting is only used on the very first
+  // reply of a conversation, not repeated on every message.
+  base += isFirstMessage
+    ? `\n\n=== TURNO ACTUAL / CURRENT TURN ===
+Este es el PRIMER mensaje del huésped en esta conversación. Incluye el saludo de bienvenida con el eslogan ahora.
+This is the guest's FIRST message in this conversation. Include the welcome greeting with the slogan now.`
+    : `\n\n=== TURNO ACTUAL / CURRENT TURN ===
+Esta conversación YA ESTÁ EN CURSO. NO repitas el eslogan ni el saludo de bienvenida. Responde directamente.
+This conversation is ALREADY IN PROGRESS. Do NOT repeat the slogan or the welcome greeting. Respond directly.`;
   try {
     const inventory = await getActiveInventory();
     const inventorySummary = inventory.map(a =>
@@ -305,7 +315,9 @@ async function executeTool(toolCall: ToolCall, phone: string): Promise<string> {
 
 // ─── Main Agent Function ───────────────────────────────────
 export async function processMessage(phone: string, userMessage: string): Promise<string> {
-  const systemPrompt = await buildSystemPrompt();
+  // First message = no prior turns in history yet (checked before we push this one).
+  const isFirstMessage = getHistory(phone).length === 0;
+  const systemPrompt = await buildSystemPrompt(isFirstMessage);
   pushHistory(phone, { role: 'user', content: userMessage });
 
   const messages: ChatMessage[] = [

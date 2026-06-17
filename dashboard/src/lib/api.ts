@@ -43,6 +43,8 @@ export const saveBusinessConfig = (row: ConfigRow) =>
 export const getAgentMode = () => request<{ mode: 'ai' | 'human' }>('/agent/mode');
 export const setAgentMode = (mode: 'ai' | 'human') =>
   request('/agent/mode', { method: 'POST', body: JSON.stringify({ mode }) });
+export const translateText = (text: string) =>
+  request<{ translated: string }>('/agent/translate', { method: 'POST', body: JSON.stringify({ text }) });
 export const getPrompt = () => request<{ prompt: string }>('/agent/prompt');
 export const savePrompt = (prompt: string) =>
   request('/agent/prompt', { method: 'PUT', body: JSON.stringify({ prompt }) });

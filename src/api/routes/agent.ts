@@ -1,10 +1,24 @@
-import { Router, Request, Response } from 'express';
+import { Router, Request, Response, NextFunction } from 'express';
 import { config } from '../../config';
 import { getSystemPrompt, setSystemPrompt, clearConversation, getConversationHistory } from '../../agents/hotel-agent';
 import { getConversations } from '../../services/message-log.service';
 import { setConversationMode } from '../../services/conversation-mode.service';
+import { translateText } from '../../services/translation.service';
 
 const router = Router();
+
+// Translate a manual reply between Spanish and English (auto-detected)
+router.post('/translate', async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const { text } = req.body;
+    if (typeof text !== 'string' || !text.trim()) {
+      res.status(400).json({ error: 'text must be a non-empty string' });
+      return;
+    }
+    const translated = await translateText(text);
+    res.json({ translated });
+  } catch (err) { next(err); }
+});
 
 router.get('/prompt', (_req: Request, res: Response) => {
   res.json({ prompt: getSystemPrompt() });
