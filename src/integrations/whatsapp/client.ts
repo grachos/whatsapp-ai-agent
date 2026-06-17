@@ -14,6 +14,7 @@ import path from 'path';
 import fs from 'fs';
 import { logger } from '../../utils/logger';
 import { sleep } from '../../utils/retry';
+import { config } from '../../config';
 import { isTranscriptionEnabled, transcribeAudio } from '../groq/whisper';
 import { addTranscription } from '../../services/transcription-store';
 import { displayNumber } from '../../services/message-log.service';
@@ -115,11 +116,54 @@ export async function resetWhatsApp(): Promise<void> {
   await connectWhatsApp();
 }
 
+// ─── Outgoing send queue (anti-ban) ──────────────────────────
+// WhatsApp bans sessions that fire many messages back-to-back. We serialize ALL
+// outgoing messages through a single queue and wait a randomized human-like delay
+// between consecutive sends, so bursts (multiple replies, bulk updates) never hit
+// the server simultaneously.
+interface QueuedSend {
+  jid: string;
+  text: string;
+  resolve: () => void;
+  reject: (err: Error) => void;
+}
+
+const sendQueue: QueuedSend[] = [];
+let draining = false;
+
+async function drainSendQueue(): Promise<void> {
+  if (draining) return;
+  draining = true;
+  try {
+    while (sendQueue.length) {
+      const item = sendQueue.shift()!;
+      try {
+        if (!sock || !status.connected) throw new Error('WhatsApp not connected');
+        const sent = await sock.sendMessage(item.jid, { text: item.text });
+        cacheSentMessage(sent?.key?.id, sent?.message);
+        item.resolve();
+      } catch (err) {
+        item.reject(err instanceof Error ? err : new Error(String(err)));
+      }
+      // Throttle only when more messages are waiting — a lone reply goes out promptly.
+      if (sendQueue.length) {
+        const delay = config.whatsapp.sendMinDelayMs + Math.random() * config.whatsapp.sendJitterMs;
+        logger.debug(`Send queue: throttling ${Math.round(delay)}ms before next of ${sendQueue.length} message(s)`);
+        await sleep(delay);
+      }
+    }
+  } finally {
+    draining = false;
+  }
+}
+
 export async function sendMessage(to: string, text: string): Promise<void> {
   if (!sock || !status.connected) throw new Error('WhatsApp not connected');
   const jid = to.includes('@') ? to : `${to}@s.whatsapp.net`;
-  const sent = await sock.sendMessage(jid, { text });
-  cacheSentMessage(sent?.key?.id, sent?.message);
+  return new Promise<void>((resolve, reject) => {
+    sendQueue.push({ jid, text, resolve, reject });
+    void drainSendQueue();
+  });
 }
 
 export async function connectWhatsApp(): Promise<void> {
@@ -278,10 +322,10 @@ async function handleVoiceNote(msg: WAMessage, from: string): Promise<string> {
   if (!isTranscriptionEnabled()) {
     logger.warn('Voice transcription disabled (no GROQ_API_KEY) — sending fallback');
     try {
-      await sock?.sendMessage(from, {
-        text: 'Por ahora solo puedo procesar mensajes de texto. ¿Podrías escribir tu consulta?\n\n' +
-              'For now I can only process text messages. Could you please type your message?',
-      });
+      await sendMessage(from,
+        'Por ahora solo puedo procesar mensajes de texto. ¿Podrías escribir tu consulta?\n\n' +
+        'For now I can only process text messages. Could you please type your message?'
+      );
     } catch { /* ignore */ }
     return '';
   }
@@ -311,10 +355,10 @@ async function handleVoiceNote(msg: WAMessage, from: string): Promise<string> {
   } catch (err) {
     logger.error(`Voice transcription failed for ${from}`, { err: err instanceof Error ? err.message : err });
     try {
-      await sock?.sendMessage(from, {
-        text: 'No pude entender tu nota de voz. ¿Podrías escribirla?\n\n' +
-              "I couldn't understand your voice note. Could you type it instead?",
-      });
+      await sendMessage(from,
+        'No pude entender tu nota de voz. ¿Podrías escribirla?\n\n' +
+        "I couldn't understand your voice note. Could you type it instead?"
+      );
     } catch { /* ignore */ }
     return '';
   }

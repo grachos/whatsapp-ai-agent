@@ -30,6 +30,10 @@ const schema = z.object({
   GOOGLE_CALENDAR_ID: z.string().default('primary'),
 
   WHATSAPP_IGNORE_GROUPS: z.string().transform(v => v === 'true').default('true'),
+  // Anti-ban: outgoing messages are serialized through a queue with a randomized
+  // human-like delay between sends (min + up to jitter extra milliseconds).
+  WHATSAPP_SEND_MIN_DELAY_MS: z.string().transform(Number).default('1200'),
+  WHATSAPP_SEND_JITTER_MS: z.string().transform(Number).default('1500'),
   SYNC_INTERVAL_MINUTES: z.string().transform(Number).default('15'),
   LOCK_TTL_SECONDS: z.string().transform(Number).default('30'),
   MAX_CONVERSATION_HISTORY: z.string().transform(Number).default('20'),
@@ -72,6 +76,8 @@ export const config = {
 
   whatsapp: {
     ignoreGroups: parsed.data.WHATSAPP_IGNORE_GROUPS,
+    sendMinDelayMs: parsed.data.WHATSAPP_SEND_MIN_DELAY_MS,
+    sendJitterMs: parsed.data.WHATSAPP_SEND_JITTER_MS,
   },
 
   sync: {

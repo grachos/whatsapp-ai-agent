@@ -212,6 +212,28 @@ OPENROUTER_MODEL=meta-llama/llama-3.1-70b-instruct
 
 Restart the server after changing the model.
 
+### Voice transcription model (Whisper)
+
+Voice notes are transcribed by **Groq Whisper**, configured separately via
+`GROQ_WHISPER_MODEL` in `.env.local`. Transcription is enabled only when
+`GROQ_API_KEY` is set; otherwise the agent replies asking the guest to send text.
+
+```env
+GROQ_API_KEY=your-groq-api-key
+
+# Fast, low-latency (default) — best for short voice notes
+GROQ_WHISPER_MODEL=whisper-large-v3-turbo
+
+# Highest accuracy, slightly slower
+GROQ_WHISPER_MODEL=whisper-large-v3
+
+# English-optimized
+GROQ_WHISPER_MODEL=distil-whisper-large-v3-en
+```
+
+Language is auto-detected (Spanish/English), so no language setting is needed.
+Restart the server after changing the model.
+
 ---
 
 ## Architecture
